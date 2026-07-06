@@ -1,4 +1,3 @@
-
 // 何もしない関数(connect用)
 export const EmptyFnc = () => ({})
 

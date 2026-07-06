@@ -1,7 +1,6 @@
 import { reactive } from 'vue'
 import { isNumeric, isEmpty } from './util.ts'
 
-
 export const urlParams = reactive({
   center: null,
   zoom: 16,
@@ -28,7 +27,7 @@ export const urlParams = reactive({
         ) {
           this.center = [a[0], a[1]]
         }
-      } catch(e){}
+      } catch (e) {}
     }
 
     if (sp.has('zoom')) {
@@ -56,7 +55,7 @@ export const urlParams = reactive({
   },
 
   getUrl() {
-    const r = new URL(window.location.href);
+    const r = new URL(window.location.href)
 
     if (this.center !== null) {
       r.searchParams.set('center', `${this.center[0]},${this.center[1]}`)
@@ -77,6 +76,6 @@ export const urlParams = reactive({
   setParam(k, v) {
     this[k] = v
 
-    window.history.replaceState({}, '', this.getUrl());
+    window.history.replaceState({}, '', this.getUrl())
   },
 })

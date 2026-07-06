@@ -3,14 +3,16 @@ import '../assets/style.scss'
 import { createApp, ref } from 'vue'
 import App from './App.vue'
 import { mapInit } from './map'
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
 
 const _initialized = ref(false)
 
 const initialize = async (): Promise<any> => {
   return new Promise((resolve) => {
-  	// if (_initialized && window.gwk?.map) {
-  	// 	resolve(window.gwk)
-  	// }
+    // if (_initialized && window.gwk?.map) {
+    // 	resolve(window.gwk)
+    // }
     if (window.gwk?.map) {
       document.body.classList.add('app-loaded')
       _initialized.value = true
@@ -24,7 +26,8 @@ const initialize = async (): Promise<any> => {
   })
 }
 
-initialize().then(_gwk=>{
-  createApp(App).mount('#app')
+initialize().then((_gwk) => {
+  const vuetify = createVuetify()
+  createApp(App).use(vuetify).mount('#app')
   mapInit(_gwk)
 })

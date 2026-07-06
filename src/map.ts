@@ -3,15 +3,17 @@ import { contentStore } from './content.ts'
 import { isNumeric, isEmpty } from './util.ts'
 import { urlParams } from './param'
 
-
 const center = [35.16449979644708, 136.89952345222818]
 
 export const baseLayersStore = reactive({
   layers: [],
 
-  setLayer({name, visible, icon, layer}) {
+  setLayer({ name, visible, icon, layer }) {
     this.layers.push({
-      name, visible, icon, layer
+      name,
+      visible,
+      icon,
+      layer,
     })
     window.map.addLayer(layer).setVisible(visible)
   },
@@ -22,23 +24,23 @@ export const baseLayersStore = reactive({
       item.layer.setVisible(visible)
       item.visible = visible
     }
-  }
+  },
 })
 
 export const layersStore = reactive({
   layers: [],
 
-  addLayer(title, style, features, visible=true) {
+  addLayer(title, style, features, visible = true) {
     const layer = window.gwk.geoJSON(null, {
       style,
       render: (geojson, defaultStyle) => {
-        return geojson, defaultStyle
-      }
+        return (geojson, defaultStyle)
+      },
     })
     layer.clear()
     layer.setVisible(visible)
-    layer.bindPopup(function(e){
-      const name = e.geojson?.properties["施設・場所名"]
+    layer.bindPopup(function (e) {
+      const name = e.geojson?.properties['施設・場所名']
       if (name !== null) {
         return name
       }
@@ -55,7 +57,7 @@ export const layersStore = reactive({
     this.layers.push({
       title,
       visible,
-      layer
+      layer,
     })
   },
 
@@ -77,20 +79,17 @@ export const layersStore = reactive({
 
     l.visible = state
     l.layer.setVisible(state)
-  }
+  },
 })
 
-
-const loadFile = async (path) : Promise<object> => {
+const loadFile = async (path): Promise<object> => {
   return new Promise((resolve, reject) => {
     fetch(path)
-      .then(r=>{
+      .then((r) => {
         if (!r.ok) {
           reject()
         }
-        r.json()
-          .then(resolve)
-          .catch(reject)
+        r.json().then(resolve).catch(reject)
       })
       .catch(reject)
   })
@@ -98,12 +97,12 @@ const loadFile = async (path) : Promise<object> => {
 
 export const panTo = (lat, lon) => {
   if (isEmpty(window.map)) {
-    return;
+    return
   }
   window.map.panTo([lat, lon])
 }
 
-export const mapInit = _gwk => {
+export const mapInit = (_gwk) => {
   let zoom = 15
 
   urlParams.read()
@@ -117,34 +116,35 @@ export const mapInit = _gwk => {
   }
 
   const map = _gwk.map('map', {
-    center, zoom,
+    center,
+    zoom,
     disableRotate: false,
   })
 
   window.map = map
-  map.extractor.addHandler('select', (v)=>{
-    console.log({v})
+  map.extractor.addHandler('select', (v) => {
+    console.log({ v })
   })
 
   baseLayersStore.setLayer({
-    name: "標準",
+    name: '標準',
     visible: true,
-    icon: "screenshot-20260609-160043.jpg",
-    layer: _gwk.stdTiles.get('std')
+    icon: 'screenshot-20260609-160043.jpg',
+    layer: _gwk.stdTiles.get('std'),
   })
 
   baseLayersStore.setLayer({
-    name: "航空地図",
+    name: '航空地図',
     visible: false,
-    icon: "screenshot-20260609-160045.jpg",
-    layer: _gwk.gsiTiles.get('ort')
+    icon: 'screenshot-20260609-160045.jpg',
+    layer: _gwk.gsiTiles.get('ort'),
   })
 
   baseLayersStore.setLayer({
-    name: "起伏地図",
+    name: '起伏地図',
     visible: false,
-    icon: "screenshot-20260609-160047.jpg",
-    layer: _gwk.gsiTiles.get('relief')
+    icon: 'screenshot-20260609-160047.jpg',
+    layer: _gwk.gsiTiles.get('relief'),
   })
 
   const f = (style, visible) => {
@@ -155,13 +155,22 @@ export const mapInit = _gwk => {
 
   layersStore.switchLayer(urlParams.layer)
 
-
-  loadFile("/hinan.geojson").then(f({
-    point: _gwk.iconStyles.get('basic_002', 'blue')
-  }, true))
-  loadFile("/sitei.geojson").then(f({
-    point: _gwk.iconStyles.get('basic_002', 'green')
-  }, false))
+  loadFile('/hinan.geojson').then(
+    f(
+      {
+        point: _gwk.iconStyles.get('basic_002', 'blue'),
+      },
+      true,
+    ),
+  )
+  loadFile('/sitei.geojson').then(
+    f(
+      {
+        point: _gwk.iconStyles.get('basic_002', 'green'),
+      },
+      false,
+    ),
+  )
 
   const pinLayer = gwk.geoJSON(null, {
     style: {
@@ -171,7 +180,7 @@ export const mapInit = _gwk => {
 
   map.addLayer(pinLayer)
 
-  map.extractor.addHandler('select', (v)=>{
+  map.extractor.addHandler('select', (v) => {
     contentStore.setFeature(v)
   })
 
@@ -199,4 +208,3 @@ export const mapInit = _gwk => {
 
   mapView.getControls().push(gpsButton)
 }
-

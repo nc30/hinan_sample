@@ -1,48 +1,58 @@
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import { contentStore } from '../content'
-  import { urlParams } from '../param'
+import { computed } from 'vue'
+import { contentStore } from '../content'
+import { urlParams } from '../param'
 
-  const contents = computed(() => {
-    const v = {}
-    if (contentStore === null) {
-      return v
-    }
-
-    for (const k of Object.keys(contentStore.current.geojson.properties)) {
-      if (k==="NO" || k.indexOf("_") === 0) {
-        continue
-      }
-      v[k] = contentStore.current.geojson.properties[k]
-    }
-
+const contents = computed(() => {
+  const v = {}
+  if (contentStore === null) {
     return v
-  })
-
-  const onCopy = (key) => {
-    if (!navigator.clipboard) {
-      return
-    }
-    navigator.clipboard.writeText(contents.value[key])
   }
 
-  const copyPage = () => {
-    if (!navigator.clipboard) {
-      return
+  for (const k of Object.keys(contentStore.current.geojson.properties)) {
+    if (k === 'NO' || k.indexOf('_') === 0) {
+      continue
     }
-    urlParams.setParam('center', contentStore.current.geojson.geometry.coordinates)
-    navigator.clipboard.writeText(urlParams.getUrl())
+    v[k] = contentStore.current.geojson.properties[k]
   }
+
+  return v
+})
+
+const onCopy = (key) => {
+  if (!navigator.clipboard) {
+    return
+  }
+  navigator.clipboard.writeText(contents.value[key])
+}
+
+const copyPage = () => {
+  if (!navigator.clipboard) {
+    return
+  }
+  urlParams.setParam(
+    'center',
+    contentStore.current.geojson.geometry.coordinates,
+  )
+  navigator.clipboard.writeText(urlParams.getUrl())
+}
 </script>
 
 <template>
   <div id="inform">
-    <div class="_share" v-if="contentStore.current !== null"><a @click="copyPage"><i class="bi bi-share"></i> ページURLをコピー</a></div>
+    <div class="_share" v-if="contentStore.current !== null">
+      <a @click="copyPage"><i class="bi bi-share"></i> ページURLをコピー</a>
+    </div>
     <div v-if="contentStore.current !== null">
       <div v-for="(value, key) in contents">
         <dl class="_item">
-          <dt>{{key}}</dt>
-          <dd>{{value}}<span v-if="value != ''" @click.prevent="()=>onCopy(key)"><i class="bi bi-copy"></i></span></dd>
+          <dt>{{ key }}</dt>
+          <dd>
+            {{ value
+            }}<span v-if="value != ''" @click.prevent="() => onCopy(key)"
+              ><i class="bi bi-copy"></i
+            ></span>
+          </dd>
         </dl>
       </div>
     </div>
