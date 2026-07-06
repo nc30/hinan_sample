@@ -8,6 +8,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
+    "fmt": "prettier --write src/ assets/",
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
@@ -19,11 +20,14 @@
     "@vitejs/plugin-vue": "^6.0.7",
     "@vue/tsconfig": "^0.9.1",
     "npm-run-all2": "^9.0.2",
+    "prettier": "^3.9.4",
     "sass-embedded": "^1.100.0",
     "typescript": "~6.0.0",
     "vite": "^8.0.16",
     "vite-plugin-vue-devtools": "^8.1.2",
-    "vue-tsc": "^3.3.5"
+    "vite-plugin-vuetify": "^2.1.3",
+    "vue-tsc": "^3.3.5",
+    "vuetify": "^4.1.3"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"
