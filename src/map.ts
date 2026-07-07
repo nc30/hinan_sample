@@ -30,6 +30,21 @@ export const baseLayersStore = reactive({
 export const layersStore = reactive({
   layers: [],
 
+  getFeature(idx, sid) {
+    const l = this.layers.at(idx)
+    let r = null
+    if (!isEmpty(l)) {
+      l.layer.eachData((f) => {
+        if (f.id == sid) {
+          r = f
+          return true
+        }
+      })
+    }
+
+    return r
+  },
+
   addLayer(title, style, features, visible = true) {
     const layer = window.gwk.geoJSON(null, {
       style,
@@ -102,17 +117,18 @@ export const panTo = (lat, lon) => {
   window.map.panTo([lat, lon])
 }
 
-export const mapInit = (_gwk) => {
+export const mapInit = async (_gwk) => {
   let zoom = 15
 
-  urlParams.read()
-  if (urlParams.center !== null) {
-    center[0] = urlParams.center[0]
-    center[1] = urlParams.center[1]
+  const params = urlParams.read()
+
+  if (params.center !== null) {
+    center[0] = params.center[0]
+    center[1] = params.center[1]
   }
 
-  if (urlParams.zoom !== null) {
-    zoom = urlParams.zoom
+  if (params.zoom !== null) {
+    zoom = params.zoom
   }
 
   const map = _gwk.map('map', {
@@ -122,9 +138,6 @@ export const mapInit = (_gwk) => {
   })
 
   window.map = map
-  map.extractor.addHandler('select', (v) => {
-    console.log({ v })
-  })
 
   baseLayersStore.setLayer({
     name: '標準',
@@ -147,15 +160,17 @@ export const mapInit = (_gwk) => {
     layer: _gwk.gsiTiles.get('relief'),
   })
 
+  // geojsonファイルロード時のコールバック
+  // TODO: 読み取り失敗時にレイヤリストのインデックスがズレないよう修正
   const f = (style, visible) => {
     return (j) => {
       layersStore.addLayer(j.name, style, j.features, visible)
     }
   }
 
-  layersStore.switchLayer(urlParams.layer)
+  layersStore.switchLayer(params.layer)
 
-  loadFile('/hinan.geojson').then(
+  await loadFile('/hinan.geojson').then(
     f(
       {
         point: _gwk.iconStyles.get('basic_002', 'blue'),
@@ -163,7 +178,8 @@ export const mapInit = (_gwk) => {
       true,
     ),
   )
-  loadFile('/sitei.geojson').then(
+
+  await loadFile('/sitei.geojson').then(
     f(
       {
         point: _gwk.iconStyles.get('basic_002', 'green'),
@@ -172,22 +188,32 @@ export const mapInit = (_gwk) => {
     ),
   )
 
+  if (params.sid !== null) {
+    const feature = layersStore.getFeature(params.layer, params.sid)
+    if (!isEmpty(feature)) {
+      contentStore.setFeature(feature)
+      // 中心点を移動
+      panTo(feature.geometry.coordinates[1], feature.geometry.coordinates[0])
+    }
+  }
+
+  // 地点クリック時のコールバック
+  map.extractor.addHandler('select', (v) => {
+    contentStore.setFeature(v.geojson)
+  })
+
+  // 現在地表示用ピンレイヤー
   const pinLayer = gwk.geoJSON(null, {
     style: {
       point: gwk.iconStyles.get('symbol_003', 'rgba(0, 0, 0, 1)'),
     },
   })
-
   map.addLayer(pinLayer)
-
-  map.extractor.addHandler('select', (v) => {
-    contentStore.setFeature(v)
-  })
 
   /// 現在地ボタンの追加
   const mapView = map.getMapView()
   const gpsButton = new gwb.ui.GPS(mapView)
-  gpsButton.enableHighAccuracy = false // trueまたはfalse
+  gpsButton.enableHighAccuracy = false
   gpsButton.events.addHandler('moved', (e) => {
     const geo = {
       type: 'Feature',
@@ -207,4 +233,8 @@ export const mapInit = (_gwk) => {
   })
 
   mapView.getControls().push(gpsButton)
+}
+
+export const updateSize = (): void => {
+  window.map !== null && window.map._mapView.updateSize()
 }

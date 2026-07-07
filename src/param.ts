@@ -5,10 +5,11 @@ export const urlParams = reactive({
   center: null,
   zoom: 16,
   layer: 0,
-  id: null,
+  sid: null,
 
   read() {
     const sp = new URL(window.location.href).searchParams
+
     if (sp.has('center')) {
       try {
         const c = sp
@@ -40,18 +41,23 @@ export const urlParams = reactive({
     if (sp.has('layer')) {
       const z = sp.get('layer').trim()
       if (isNumeric(z)) {
-        this.layer = z
+        this.layer = Number(z)
       }
     }
 
     if (sp.has('id')) {
       const z = sp.get('id').trim()
       if (isNumeric(z)) {
-        this.id = z
+        this.sid = Number(z)
       }
     }
 
-    return this
+    return {
+      center: this.center,
+      zoom: this.zoom,
+      layer: this.layer,
+      sid: this.sid,
+    }
   },
 
   getUrl() {
@@ -66,8 +72,8 @@ export const urlParams = reactive({
     if (this.layer !== null) {
       r.searchParams.set('layer', `${this.layer}`)
     }
-    if (this.id !== null) {
-      r.searchParams.set('id', `${this.id}`)
+    if (this.sid !== null) {
+      r.searchParams.set('id', `${this.sid}`)
     }
 
     return r.toString()

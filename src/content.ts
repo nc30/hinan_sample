@@ -1,4 +1,9 @@
+/*
+  表示ポイント用ストア
+*/
+
 import { reactive } from 'vue'
+import { isEmpty } from './util'
 import { urlParams } from './param'
 
 export const contentStore = reactive({
@@ -6,11 +11,14 @@ export const contentStore = reactive({
 
   clear: function () {
     this.current = null
-    urlParams.setParam('id', null)
+    urlParams.setParam('sid', null)
   },
 
-  setFeature: function (feature) {
-    this.current = feature
-    urlParams.setParam('id', feature.geojson.id)
+  setFeature: function (geojson) {
+    this.current = geojson
+    if (!isEmpty(geojson)) {
+      // urlにidを反映させる
+      urlParams.setParam('sid', geojson.id)
+    }
   },
 })

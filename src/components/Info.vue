@@ -3,22 +3,25 @@ import { computed } from 'vue'
 import { contentStore } from '../content'
 import { urlParams } from '../param'
 
+// geojsonから表示できるパラメーターを抽出する。
+// NOと/^_*/を除外する
 const contents = computed(() => {
   const v = {}
   if (contentStore === null) {
     return v
   }
 
-  for (const k of Object.keys(contentStore.current.geojson.properties)) {
+  for (const k of Object.keys(contentStore.current.properties)) {
     if (k === 'NO' || k.indexOf('_') === 0) {
       continue
     }
-    v[k] = contentStore.current.geojson.properties[k]
+    v[k] = contentStore.current.properties[k]
   }
 
   return v
 })
 
+// コピーボタンを押された時の動作
 const onCopy = (key) => {
   if (!navigator.clipboard) {
     return
@@ -26,14 +29,12 @@ const onCopy = (key) => {
   navigator.clipboard.writeText(contents.value[key])
 }
 
+// ページシェアボタンを押された時の動作
 const copyPage = () => {
   if (!navigator.clipboard) {
     return
   }
-  urlParams.setParam(
-    'center',
-    contentStore.current.geojson.geometry.coordinates,
-  )
+  urlParams.setParam('center', contentStore.current.geometry.coordinates)
   navigator.clipboard.writeText(urlParams.getUrl())
 }
 </script>
