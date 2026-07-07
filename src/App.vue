@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
-import SideMenu from './components/SideMenu.vue'
 import { updateSize } from './map'
+import SideMenu from './components/SideMenu.vue'
+import Legends from './components/Legends.vue'
 
 const { mobile } = useDisplay()
 
@@ -31,6 +32,7 @@ const toggle = () => {
     <div id="mobileHead" v-if="mobile">
       <h1><i class="bi bi-person-walking"></i>防災マップ</h1>
     </div>
+    <Legends />
   </div>
 </template>
 

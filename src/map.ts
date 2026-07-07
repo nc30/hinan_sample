@@ -5,6 +5,7 @@ import { urlParams } from './param'
 
 const center = [35.16449979644708, 136.89952345222818]
 
+// 基本レイヤーのストア
 export const baseLayersStore = reactive({
   layers: [],
 
@@ -27,6 +28,7 @@ export const baseLayersStore = reactive({
   },
 })
 
+// フィーチャーレイヤーのストア
 export const layersStore = reactive({
   layers: [],
 
@@ -45,7 +47,7 @@ export const layersStore = reactive({
     return r
   },
 
-  addLayer(title, style, features, visible = true) {
+  addLayer(title, style, features, visible = true, color = '#000') {
     const layer = window.gwk.geoJSON(null, {
       style,
       render: (geojson, defaultStyle) => {
@@ -73,6 +75,7 @@ export const layersStore = reactive({
       title,
       visible,
       layer,
+      color,
     })
   },
 
@@ -97,6 +100,7 @@ export const layersStore = reactive({
   },
 })
 
+// jsonを読み込んでコールバックを叩く
 const loadFile = async (path): Promise<object> => {
   return new Promise((resolve, reject) => {
     fetch(path)
@@ -162,31 +166,31 @@ export const mapInit = async (_gwk) => {
 
   // geojsonファイルロード時のコールバック
   // TODO: 読み取り失敗時にレイヤリストのインデックスがズレないよう修正
-  const f = (style, visible) => {
+  const f = (style, visible, color) => {
     return (j) => {
       layersStore.addLayer(j.name, style, j.features, visible)
     }
   }
 
+  const setGeoJsonCallback = (visible, color) => {
+    return (j) => {
+      layersStore.addLayer(
+        j.name,
+        {
+          point: _gwk.iconStyles.get('basic_002', color),
+        },
+        j.features,
+        visible,
+        color,
+      )
+    }
+  }
+
   layersStore.switchLayer(params.layer)
 
-  await loadFile('/hinan.geojson').then(
-    f(
-      {
-        point: _gwk.iconStyles.get('basic_002', 'blue'),
-      },
-      true,
-    ),
-  )
+  await loadFile('/hinan.geojson').then(setGeoJsonCallback(true, '#333'))
 
-  await loadFile('/sitei.geojson').then(
-    f(
-      {
-        point: _gwk.iconStyles.get('basic_002', 'green'),
-      },
-      false,
-    ),
-  )
+  await loadFile('/sitei.geojson').then(setGeoJsonCallback(false, 'green'))
 
   if (params.sid !== null) {
     const feature = layersStore.getFeature(params.layer, params.sid)
@@ -235,6 +239,7 @@ export const mapInit = async (_gwk) => {
   mapView.getControls().push(gpsButton)
 }
 
+// 地図サイズ更新
 export const updateSize = (): void => {
   window.map !== null && window.map._mapView.updateSize()
 }

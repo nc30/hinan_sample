@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { layersStore } from '../map'
-import { urlParams } from '../param'
+import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import Info from './Info.vue'
 import BaseLayers from './BaseLayers.vue'
 import LayersCheckbox from './LayersCheckbox.vue'
+import LayersSelector from './LayersSelector.vue'
 
-const selected = ref(urlParams.layer)
 const { mobile } = useDisplay()
-
-watch(
-  selected,
-  () => {
-    layersStore.switchLayer(selected.value)
-    urlParams.setParam('layer', selected)
-  },
-  { immediate: true },
-)
 </script>
 
 <template>
@@ -31,15 +20,7 @@ watch(
         <div>
           <h2>地域・種別選択</h2>
           <LayersCheckbox />
-          <select v-model="selected">
-            <option
-              type="checkbox"
-              v-for="(layer, idx) in layersStore.layers"
-              :value="idx"
-            >
-              {{ layer.title }}
-            </option>
-          </select>
+          <LayersSelector />
         </div>
         <div>
           <br />
@@ -85,11 +66,5 @@ watch(
 h1 {
   border-radius: 1px;
   color: #48af7f;
-}
-
-select {
-  display: inline-block;
-  width: 100%;
-  padding: 5px;
 }
 </style>
