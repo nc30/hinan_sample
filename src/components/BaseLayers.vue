@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { baseLayersStore } from '../map'
 
-const changeBaseLayer = (idx) => {
+const changeBaseLayer = (idx: number) => {
   baseLayersStore.changeLayer(idx)
 }
 </script>

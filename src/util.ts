@@ -2,7 +2,8 @@
 export const EmptyFnc = () => ({})
 
 // 数字として扱えるかどうか
-export const isNumeric = (n): boolean => n === '0' || !!Number(n)
+export const isNumeric = (n: string | undefined): boolean =>
+  n !== undefined && (n === '0' || !!Number(n))
 
 // 空かどうか(null,undefined,[])
 export const isEmpty = (n: any): boolean =>
@@ -14,7 +15,7 @@ export const getQuery = (q: string): string | null => {
   return sp.has(q) ? sp.get(q) : null
 }
 
-export const loadJson = async (path: string) => loadJsonLaw(truePath(path))
+export const loadJson = async (path: string) => loadJsonLaw(path)
 export const loadJsonLaw = async (path: string) => {
   const a = await fetch(path)
   return a.json()

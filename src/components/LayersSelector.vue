@@ -3,12 +3,14 @@ import { ref, watch } from 'vue'
 import { layersStore } from '../map'
 import { urlParams } from '../param'
 
-const selected = ref(urlParams.layer)
+const selected = ref<number | null>(urlParams.layer)
 watch(
   selected,
   () => {
-    layersStore.switchLayer(selected.value)
-    urlParams.setParam('layer', selected)
+    if (selected.value != null) {
+      layersStore.switchLayer(selected.value)
+      urlParams.setParam('layer', selected)
+    }
   },
   { immediate: true },
 )

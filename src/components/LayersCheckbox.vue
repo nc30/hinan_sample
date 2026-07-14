@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { layersStore } from '../map'
 
-const change = (idx) => {
-  layersStore.setVisible(idx, !layersStore.layers[idx].visible)
+const change = (idx: number) => {
+  const layer = layersStore.layers[idx]
+  if (layer != undefined) {
+    layersStore.setVisible(idx, !layer.visible)
+  }
 }
 </script>
 
@@ -13,7 +16,7 @@ const change = (idx) => {
         <label
           ><input
             type="checkbox"
-            @change="() => change(idx)"
+            @change="() => change(Number(idx))"
             :checked="layer.visible" />{{ layer.title
           }}<span class="_color" :style="{ backgroundColor: layer.color }">
           </span

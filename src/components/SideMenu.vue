@@ -6,16 +6,19 @@ import BaseLayers from './BaseLayers.vue'
 import LayersCheckbox from './LayersCheckbox.vue'
 import LayersSelector from './LayersSelector.vue'
 
+import FloatingBaseLayerSelector from './FloatingBaseLayerSelector.vue'
+
 const { mobile } = useDisplay()
 </script>
 
 <template>
-  <div id="sideBar" :style="{ mobileMode: mobile }">
+  <div id="sideBar" :class="{ mobileMode: mobile }">
     <div class="_head" v-if="!mobile">
       <h1><i class="bi bi-person-walking"></i>防災マップ</h1>
     </div>
     <div class="_body">
       <div class="__inner">
+        <FloatingBaseLayerSelector />
         <BaseLayers />
         <div>
           <h2>地域・種別選択</h2>

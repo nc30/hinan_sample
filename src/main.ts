@@ -6,13 +6,24 @@ import { mapInit } from './map'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
+import type { GisapEmbeddedMapType } from './types.d'
+
+declare global {
+  /* eslint no-var: 0 */
+  var gwk: any
+  /* eslint no-var: 0 */
+  var gwb: any
+  /* eslint no-var: 0 */
+  var map: GisapEmbeddedMapType
+
+  /* eslint no-var: 0 */
+  var loadedCallback: () => void
+}
+
 const _initialized = ref(false)
 
 const initialize = async (): Promise<any> => {
   return new Promise((resolve) => {
-    // if (_initialized && window.gwk?.map) {
-    // 	resolve(window.gwk)
-    // }
     if (window.gwk?.map) {
       document.body.classList.add('app-loaded')
       _initialized.value = true

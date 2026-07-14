@@ -3,25 +3,64 @@ import { contentStore } from './content.ts'
 import { isNumeric, isEmpty } from './util.ts'
 import { urlParams } from './param'
 
+import type {
+  GeojsonType,
+  GwkLayerType,
+  StyleType,
+  GeoType,
+  MovedEvent,
+  SelectEvent,
+  FeatureType,
+} from './types.d'
+
 const center = [35.16449979644708, 136.89952345222818]
 
+type LayerType = {
+  name: string
+  visible: boolean
+  icon: string
+  layer: GwkLayerType
+}
+
+type BaselayerStoreType = {
+  layers: LayerType[]
+  setLayer: (params: LayerType) => void
+  changeLayer: (idx: number | string) => void
+}
+
+type LayersStoreType = {
+  layers: {
+    title: string
+    visible: boolean
+    color: string
+    layer: GwkLayerType
+  }[]
+
+  getFeature: (idx: number, sid: string) => any | null
+  addLayer: (
+    title: string,
+    style: any,
+    features: any,
+    visible: boolean,
+    color: string,
+  ) => void
+  setVisible: (idx: number, state: boolean) => void
+  switchLayer: (idx: number) => void
+}
+
 // 基本レイヤーのストア
-export const baseLayersStore = reactive({
+export const baseLayersStore = reactive<BaselayerStoreType>({
   layers: [],
 
-  setLayer({ name, visible, icon, layer }) {
-    this.layers.push({
-      name,
-      visible,
-      icon,
-      layer,
-    })
+  setLayer(params: LayerType) {
+    const { layer, visible } = params
+    this.layers.push(params)
     window.map.addLayer(layer).setVisible(visible)
   },
 
   changeLayer(idx) {
     for (const [i, item] of this.layers.entries()) {
-      const visible = idx == i
+      const visible: boolean = idx == i
       item.layer.setVisible(visible)
       item.visible = visible
     }
@@ -29,13 +68,13 @@ export const baseLayersStore = reactive({
 })
 
 // フィーチャーレイヤーのストア
-export const layersStore = reactive({
+export const layersStore = reactive<LayersStoreType>({
   layers: [],
 
   getFeature(idx, sid) {
     const l = this.layers.at(idx)
     let r = null
-    if (!isEmpty(l)) {
+    if (l !== undefined) {
       l.layer.eachData((f) => {
         if (f.id == sid) {
           r = f
@@ -50,13 +89,13 @@ export const layersStore = reactive({
   addLayer(title, style, features, visible = true, color = '#000') {
     const layer = window.gwk.geoJSON(null, {
       style,
-      render: (geojson, defaultStyle) => {
-        return (geojson, defaultStyle)
+      render: (geojson: GeojsonType, defaultStyle: StyleType) => {
+        return defaultStyle
       },
     })
     layer.clear()
     layer.setVisible(visible)
-    layer.bindPopup(function (e) {
+    layer.bindPopup((e: FeatureType) => {
       const name = e.geojson?.properties['施設・場所名']
       if (name !== null) {
         return name
@@ -101,7 +140,7 @@ export const layersStore = reactive({
 })
 
 // jsonを読み込んでコールバックを叩く
-const loadFile = async (path): Promise<object> => {
+const loadFile = async (path: string): Promise<GeoType> => {
   return new Promise((resolve, reject) => {
     fetch(path)
       .then((r) => {
@@ -114,14 +153,14 @@ const loadFile = async (path): Promise<object> => {
   })
 }
 
-export const panTo = (lat, lon) => {
+export const panTo = (lat: number, lon: number) => {
   if (isEmpty(window.map)) {
     return
   }
-  window.map.panTo([lat, lon])
+  window.map.panTo([lat, lon], () => {})
 }
 
-export const mapInit = async (_gwk) => {
+export const mapInit = async (_gwk: any) => {
   let zoom = 15
 
   const params = urlParams.read()
@@ -166,14 +205,8 @@ export const mapInit = async (_gwk) => {
 
   // geojsonファイルロード時のコールバック
   // TODO: 読み取り失敗時にレイヤリストのインデックスがズレないよう修正
-  const f = (style, visible, color) => {
-    return (j) => {
-      layersStore.addLayer(j.name, style, j.features, visible)
-    }
-  }
-
-  const setGeoJsonCallback = (visible, color) => {
-    return (j) => {
+  const setGeoJsonCallback = (visible: boolean, color: string) => {
+    return (j: GeoType) => {
       layersStore.addLayer(
         j.name,
         {
@@ -202,7 +235,8 @@ export const mapInit = async (_gwk) => {
   }
 
   // 地点クリック時のコールバック
-  map.extractor.addHandler('select', (v) => {
+  map.extractor.addHandler('select', (v: SelectEvent) => {
+    console.log({ v })
     contentStore.setFeature(v.geojson)
   })
 
@@ -216,11 +250,12 @@ export const mapInit = async (_gwk) => {
 
   /// 現在地ボタンの追加
   const mapView = map.getMapView()
-  const gpsButton = new gwb.ui.GPS(mapView)
+  const gpsButton = new window.gwb.ui.GPS(mapView)
   gpsButton.enableHighAccuracy = false
-  gpsButton.events.addHandler('moved', (e) => {
+  gpsButton.events.addHandler('moved', (e: MovedEvent) => {
     const geo = {
       type: 'Feature',
+      sid: '0',
       properties: {
         SID: 0,
       },

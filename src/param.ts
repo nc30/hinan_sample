@@ -1,7 +1,20 @@
 import { reactive } from 'vue'
 import { isNumeric, isEmpty } from './util.ts'
+import type { CoordinateType } from './types.d'
 
-export const urlParams = reactive({
+type UrlParam = 'center' | 'zoom' | 'layer' | 'sid'
+type UrlParamType = {
+  center: CoordinateType | null
+  zoom: number | null
+  layer: number | null
+  sid: string | null
+
+  read: () => any
+  getUrl: () => string
+  setParam: (k: UrlParam, v: any) => void
+}
+
+export const urlParams = reactive<UrlParamType>({
   center: null,
   zoom: 16,
   layer: 0,
@@ -12,43 +25,46 @@ export const urlParams = reactive({
 
     if (sp.has('center')) {
       try {
-        const c = sp
+        const c: number[] | undefined = sp
           .get('center')
-          .split(',')
+          ?.split(',')
           .map((z) => z.trim())
           .filter((z) => !isEmpty(z))
           .filter((z) => isNumeric(z))
           .map((z) => Number(z))
+
         if (
-          a.length === 2 &&
-          -90 <= a[0] &&
-          a[0] <= 90 &&
-          -180 <= a[1] &&
-          a[1] <= 180
+          c != undefined &&
+          c[0] !== undefined &&
+          c[1] !== undefined &&
+          -90 <= c[0] &&
+          c[0] <= 90 &&
+          -180 <= c[1] &&
+          c[1] <= 180
         ) {
-          this.center = [a[0], a[1]]
+          this.center = [c[0], c[1]]
         }
       } catch (e) {}
     }
 
     if (sp.has('zoom')) {
-      const z = sp.get('zoom').trim()
+      const z = sp.get('zoom')?.trim()
       if (isNumeric(z)) {
-        this.zoom = z
+        this.zoom = Number(z)
       }
     }
 
     if (sp.has('layer')) {
-      const z = sp.get('layer').trim()
+      const z = sp.get('layer')?.trim()
       if (isNumeric(z)) {
         this.layer = Number(z)
       }
     }
 
     if (sp.has('id')) {
-      const z = sp.get('id').trim()
-      if (isNumeric(z)) {
-        this.sid = Number(z)
+      const z = sp.get('id')?.trim()
+      if (z !== undefined) {
+        this.sid
       }
     }
 

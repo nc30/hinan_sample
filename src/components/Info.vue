@@ -6,23 +6,22 @@ import { urlParams } from '../param'
 // geojsonから表示できるパラメーターを抽出する。
 // NOと/^_*/を除外する
 const contents = computed(() => {
-  const v = {}
-  if (contentStore === null) {
-    return v
-  }
+  const v: any = {}
 
-  for (const k of Object.keys(contentStore.current.properties)) {
-    if (k === 'NO' || k.indexOf('_') === 0) {
-      continue
+  if (contentStore.current !== null) {
+    for (const k of Object.keys(contentStore.current?.properties)) {
+      if (k === 'NO' || k.indexOf('_') === 0) {
+        continue
+      }
+      v[k] = contentStore.current.properties[k]
     }
-    v[k] = contentStore.current.properties[k]
   }
 
   return v
 })
 
 // コピーボタンを押された時の動作
-const onCopy = (key) => {
+const onCopy = (key: number | string) => {
   if (!navigator.clipboard) {
     return
   }
@@ -34,7 +33,9 @@ const copyPage = () => {
   if (!navigator.clipboard) {
     return
   }
-  urlParams.setParam('center', contentStore.current.geometry.coordinates)
+  if (contentStore.current !== null) {
+    urlParams.setParam('center', contentStore.current.geometry.coordinates)
+  }
   navigator.clipboard.writeText(urlParams.getUrl())
 }
 </script>
