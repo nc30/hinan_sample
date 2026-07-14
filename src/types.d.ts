@@ -1,5 +1,3 @@
-export type GwkMapType = {}
-
 export type CoordinateType = [number, number]
 
 export type GeoType = {
@@ -36,14 +34,37 @@ export type GisapEmebddedStylesStyleBase = {
   isValid: () => boolean
 }
 
+// https://www.gisap-cloud.com/dev/Webkit/apidoc/nes.gisap.embedded.styles.PointStyle.html
+export type GisapEmbeddedStylesPointStyle =
+  | {
+      balloonOffsetArray: number[]
+      color: string
+      icon: string
+      iconAnchor: number[]
+      name: string
+      opacity: number
+      rotate: number
+      scale: number
+      size: [number, number]
+      strokeColor: string
+      strokeWidth: number
+    }
+  | GisapEmebddedStylesStyleBase
+
+// https://www.gisap-cloud.com/dev/Webkit/apidoc/nes.gisap.embedded.styles.StyleManager.html
+export type GisapEmbeddedStylesStyleManager = {
+  get: (key: string) => GisapEmebddedStylesStyleBase
+}
+
 export type GisapEmbeddedGeoPos = {
   getInternalObject: () => [number, number] // TODO
   toLngLat: () => [number, number]
   toXY: (includeEPSG: boolean) => [number, number]
   transform: (toEPSG: number) => void
 }
+
 export type PopupCallback = (
-  e: object,
+  e: any,
   position: GisapEmbeddedGeoPos,
   nativeFeature: object,
 ) => string
@@ -102,11 +123,11 @@ export type GisapEmbeddedLayersGeoJSONLayer =
     // https://www.gisap-cloud.com/dev/Webkit/apidoc/nes.gisap.embedded.layers.GeoJSONLayer.html
 
     selectable: boolean
-
+    styles: GisapEmbeddedStylesStyleManager
     addData: (
       geoJSON: object,
-      style: GisapEmebddedStylesStyleBase,
-      nonCopy: boolean,
+      style?: GisapEmebddedStylesStyleBase,
+      nonCopy?: boolean,
     ) => object
     bindPopup: (
       contents: string | PopupCallback,
@@ -115,16 +136,16 @@ export type GisapEmbeddedLayersGeoJSONLayer =
     closePopup: () => GisapEmbeddedLayersGeoJSONLayer
     eachData: (
       callback: EachDataCallback,
-      conditions: object,
-      recordLimit: number,
-      sortOrders: string,
-      lastCallback: () => void,
+      conditions?: object,
+      recordLimit?: number,
+      sortOrders?: string,
+      lastCallback?: () => void,
     ) => void
     getData: (
       callback: GeoJsonDataCallback,
-      conditions: object,
-      recordLimit: number,
-      sortOrders: string,
+      conditions?: object,
+      recordLimit?: number,
+      sortOrders?: string,
     ) => void
     getDataRange: (callback: RangeCallback, conditions: object) => void
     isPopupOpen: () => boolean

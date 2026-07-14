@@ -57,11 +57,13 @@ const currentLayer = computed(() => {
 
 <style scoped lang="scss">
 #FloatingBaseLayerSelector {
-  position: relative;
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
 
   & > ._current {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     overflow: hidden;
     border-radius: 5px;
     border: solid #2c2e99 1px;
@@ -71,7 +73,7 @@ const currentLayer = computed(() => {
   & > ._selector {
     position: absolute;
     top: -10px;
-    left: 100px;
+    left: 80px;
 
     display: flex;
     border: solid #2c2e99 1px;
@@ -88,7 +90,7 @@ const currentLayer = computed(() => {
     cursor: pointer;
 
     img {
-      width: 80px;
+      width: 50px;
       margin-right: 20px;
       border-radius: 5px;
       border: solid #fff0 3px;

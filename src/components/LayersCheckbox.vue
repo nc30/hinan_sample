@@ -13,14 +13,19 @@ const change = (idx: number) => {
   <div id="layersCheckbox">
     <ul>
       <li v-for="(layer, idx) in layersStore.layers">
-        <label
-          ><input
+        <label>
+          <input
             type="checkbox"
             @change="() => change(Number(idx))"
-            :checked="layer.visible" />{{ layer.title
-          }}<span class="_color" :style="{ backgroundColor: layer.color }">
-          </span
-        ></label>
+            :checked="layer.visible"
+          />
+          <span
+            class="_color"
+            v-if="layer.defaultStyle !== null && 'icon' in layer.defaultStyle"
+            ><img :src="layer.defaultStyle.icon"
+          /></span>
+          {{ layer.title }}
+        </label>
       </li>
     </ul>
   </div>
@@ -43,6 +48,8 @@ const change = (idx: number) => {
       height: 1em;
       border-radius: 0.5em;
       margin-left: 0.5em;
+      margin-right: 0.5em;
+      margin-top: -5px;
     }
   }
 

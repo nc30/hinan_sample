@@ -2,11 +2,7 @@
 import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import Info from './Info.vue'
-import BaseLayers from './BaseLayers.vue'
 import LayersCheckbox from './LayersCheckbox.vue'
-import LayersSelector from './LayersSelector.vue'
-
-import FloatingBaseLayerSelector from './FloatingBaseLayerSelector.vue'
 
 const { mobile } = useDisplay()
 </script>

@@ -3,7 +3,11 @@ import { contentStore } from './content.ts'
 import { isNumeric, isEmpty } from './util.ts'
 import { urlParams } from './param'
 
+import type {} from './types.d'
+
 import type {
+  GisapEmbeddedStylesPointStyle,
+  GisapEmbeddedLayersGeoJSONLayer,
   GeojsonType,
   GwkLayerType,
   StyleType,
@@ -33,7 +37,8 @@ type LayersStoreType = {
     title: string
     visible: boolean
     color: string
-    layer: GwkLayerType
+    layer: GisapEmbeddedLayersGeoJSONLayer
+    defaultStyle: GisapEmbeddedStylesPointStyle | null
   }[]
 
   getFeature: (idx: number, sid: string) => any | null
@@ -87,7 +92,7 @@ export const layersStore = reactive<LayersStoreType>({
   },
 
   addLayer(title, style, features, visible = true, color = '#000') {
-    const layer = window.gwk.geoJSON(null, {
+    const layer: GisapEmbeddedLayersGeoJSONLayer = window.gwk.geoJSON(null, {
       style,
       render: (geojson: GeojsonType, defaultStyle: StyleType) => {
         return defaultStyle
@@ -95,7 +100,7 @@ export const layersStore = reactive<LayersStoreType>({
     })
     layer.clear()
     layer.setVisible(visible)
-    layer.bindPopup((e: FeatureType) => {
+    layer.bindPopup((e, position, nativeFeature) => {
       const name = e.geojson?.properties['施設・場所名']
       if (name !== null) {
         return name
@@ -110,11 +115,16 @@ export const layersStore = reactive<LayersStoreType>({
       window.map.addLayer(layer)
     }
 
+    const defaultStyle = layer.styles.get(
+      'point',
+    ) as GisapEmbeddedStylesPointStyle
+
     this.layers.push({
       title,
       visible,
       layer,
       color,
+      defaultStyle,
     })
   },
 
@@ -236,7 +246,6 @@ export const mapInit = async (_gwk: any) => {
 
   // 地点クリック時のコールバック
   map.extractor.addHandler('select', (v: SelectEvent) => {
-    console.log({ v })
     contentStore.setFeature(v.geojson)
   })
 

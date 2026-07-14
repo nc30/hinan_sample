@@ -12,9 +12,13 @@ const list = computed(() => {
     凡例
     <div>
       <ul>
-        <li v-for="l in list">
-          <span class="_color" :style="{ backgroundColor: l.color }"></span
-          >{{ l.title }}
+        <li v-for="layer in list">
+          <span class="_color">
+            <img
+              v-if="layer.defaultStyle !== null && 'icon' in layer.defaultStyle"
+              :src="layer.defaultStyle.icon"
+            /> </span
+          >{{ layer.title }}
         </li>
       </ul>
     </div>

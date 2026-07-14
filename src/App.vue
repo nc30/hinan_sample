@@ -4,6 +4,7 @@ import { useDisplay } from 'vuetify'
 import { updateSize } from './map'
 import SideMenu from './components/SideMenu.vue'
 import Legends from './components/Legends.vue'
+import FloatingBaseLayerSelector from './components/FloatingBaseLayerSelector.vue'
 
 const { mobile } = useDisplay()
 
@@ -28,7 +29,10 @@ const toggle = () => {
       </div>
       <SideMenu />
     </div>
-    <div id="map"></div>
+    <div class="_map">
+      <div id="map"></div>
+      <FloatingBaseLayerSelector />
+    </div>
     <div id="mobileHead" v-if="mobile">
       <h1><i class="bi bi-person-walking"></i>防災マップ</h1>
     </div>
@@ -77,6 +81,11 @@ const toggle = () => {
       }
     }
   }
+
+  > ._map {
+    position: relative;
+    flex: 1;
+  }
 }
 
 #mobileHead {
@@ -90,6 +99,7 @@ const toggle = () => {
 }
 
 #map {
-  flex: 1;
+  width: 100%;
+  height: 100%;
 }
 </style>

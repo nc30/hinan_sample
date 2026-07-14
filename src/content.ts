@@ -23,7 +23,6 @@ export const contentStore = reactive<ContentStoreType>({
   },
 
   setFeature: function (geojson) {
-    console.log(geojson)
     this.current = geojson
     if (geojson !== null) {
       // urlにidを反映させる
