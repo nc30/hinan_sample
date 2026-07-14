@@ -64,7 +64,7 @@ export const urlParams = reactive<UrlParamType>({
     if (sp.has('id')) {
       const z = sp.get('id')?.trim()
       if (z !== undefined) {
-        this.sid
+        this.sid = z
       }
     }
 

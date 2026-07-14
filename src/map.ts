@@ -232,8 +232,9 @@ export const mapInit = async (_gwk: any) => {
   layersStore.switchLayer(params.layer)
 
   await loadFile('/hinan.geojson').then(setGeoJsonCallback(true, '#333'))
-
   await loadFile('/sitei.geojson').then(setGeoJsonCallback(false, 'green'))
+
+  console.log({ params })
 
   if (params.sid !== null) {
     const feature = layersStore.getFeature(params.layer, params.sid)
